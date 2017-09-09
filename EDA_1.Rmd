@@ -1,0 +1,62 @@
+---
+title: "Your title"
+author: Edward Lu
+date: "Current date"
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    fig_width: 7
+    fig_height: 4.5
+    theme: readable
+    highlight: tango
+---
+
+```{r}
+# Create a folder for working with exploratory data analysis 
+# Only run this line once 
+# dir.create(path=paste(getwd(),"/1_EDA",sep=""  ), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+```
+
+
+## Load data 
+
+```{r}
+library(data.table)
+boston_raw=fread("train.csv")
+Boston_test=fread("test.csv")
+
+```
+
+Look at the data 
+
+## Data exploration
+
+
+
+
+
+## Data cleaning
+
+
+
+
+## Baseline model
+
+
+
+
+## Feature selection 
+
+
+
+
+
+## ML algorithm spot check
+
+
+
+
+
+## Ensemble modeling
+
