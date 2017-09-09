@@ -12,7 +12,7 @@ timeRecordB=function(message="None"){
     
     file_name=extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use 
     
-    write(c("None",proc.time()),ncolumns = 6 ,file=file_name,append=TRUE)
+    write(c(message,proc.time()),ncolumns = 6 ,file=file_name,append=TRUE)
   }else{
     file_name=paste(format(Sys.time(), "%F_%T"),".log",sep="")
     
@@ -20,7 +20,7 @@ timeRecordB=function(message="None"){
     # make the insanely long name a global variable
     extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use<<-file_name
     
-    time_variable=c("None",proc.time())
+    time_variable=c(message,proc.time())
     
     write(time_variable,file=file_name,ncolumns = 6 ,append=TRUE)
     if(file.exists(file_name)){
