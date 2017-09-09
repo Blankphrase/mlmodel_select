@@ -43,7 +43,7 @@ timeRecordB=function(message="None"){
 
 
 
-timeRecordR=function(unit="s"){
+timeRecordR=function(unit="s",ignore=1){
   
   # If the file needed to read is there. Then, we could began to read it into R. 
   if(file.exists(extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use)){
@@ -60,8 +60,9 @@ timeRecordR=function(unit="s"){
            s={time_dataframe=cbind(time_dataframe,run_time=time_interval)}
            ,min={time_dataframe=cbind(time_dataframe,run_time=time_interval/60)}
            ,hr={time_dataframe=cbind(time_dataframe,run_time=time_interval/3600)} )
-    
-    
+    library(dplyr)
+    library(magrittr)
+    time_dataframe=time_dataframe%>%filter(run_time>ignore)
     
     
   }else{
