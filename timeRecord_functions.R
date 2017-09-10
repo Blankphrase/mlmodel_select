@@ -12,7 +12,7 @@ timeRecordB=function(message="None"){
     
     file_name=extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use 
     
-    write(c(message,proc.time()),ncolumns = 6 ,file=file_name,append=TRUE)
+    write(c(message,proc.time()),ncolumns = 6 ,file=file_name,append=TRUE,sep=",")
   }else{
     file_name=paste(format(Sys.time(), "%F_%T"),".log",sep="")
     
@@ -22,7 +22,7 @@ timeRecordB=function(message="None"){
     
     time_variable=c(message,proc.time())
     
-    write(time_variable,file=file_name,ncolumns = 6 ,append=TRUE)
+    write(time_variable,file=file_name,ncolumns = 6 ,append=TRUE,sep=",")
     if(file.exists(file_name)){
       
       print("Fun time log has been created")
@@ -48,7 +48,7 @@ timeRecordR=function(unit="s",ignore=1){
   # If the file needed to read is there. Then, we could began to read it into R. 
   if(file.exists(extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use)){
     
-    time_dataframe=read.table(extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use)
+    time_dataframe=read.table(extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use,sep=",")
     
     colnames(time_dataframe)=c("message",names(proc.time()) )
     
