@@ -41,7 +41,6 @@ mlog_init=function(name="ML"){
 # There are going to be issues if you are working on different datasets in the same working environment. It will not distinguish the prediction information from different datasets. 
 # But if you are going to combine results from different dataset predictions, that is fine. 
 ####################################################################################################################
-#???????????? How to differentiate between differnt datasets still eludes me. 
 ####################################################################################################################
 
 # Necessary ml information to the log. 

@@ -4,7 +4,7 @@
 # Adding current time to the log. 
 # This function will create a log if there is no current log in the Rsession. 
 
-timeRecordB=function(message="None"){
+timeRecordB=function(output_message="None"){
   
   
   # append to file the current time if the file is already there.  
@@ -12,7 +12,7 @@ timeRecordB=function(message="None"){
     
     file_name=extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use 
     
-    write(c(message,proc.time()),ncolumns = 6 ,file=file_name,append=TRUE,sep=",")
+    write(c(output_message,proc.time()),ncolumns = 6 ,file=file_name,append=TRUE,sep=",")
   }else{
     file_name=paste(format(Sys.time(), "%F_%T"),".log",sep="")
     
@@ -20,7 +20,7 @@ timeRecordB=function(message="None"){
     # make the insanely long name a global variable
     extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use<<-file_name
     
-    time_variable=c(message,proc.time())
+    time_variable=c(output_message,proc.time())
     
     write(time_variable,file=file_name,ncolumns = 6 ,append=TRUE,sep=",")
     if(file.exists(file_name)){
@@ -50,7 +50,7 @@ timeRecordR=function(unit="s",ignore=1){
     
     time_dataframe=read.table(extremely_long_name_i_do_not_think_anyone_would_be_sanely_to_use,sep=",")
     
-    colnames(time_dataframe)=c("message",names(proc.time()) )
+    colnames(time_dataframe)=c("output_message",names(proc.time()) )
     
     
     time_interval=c(0,diff(time_dataframe[,"elapsed"]))
