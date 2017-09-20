@@ -1,5 +1,7 @@
 ## Wrapper for auto-tune xgbTree and xgbLinear function. 
 
+
+
 ## Load all the library dependencies here. 
 library(foreach)
 library(magrittr)
@@ -12,20 +14,19 @@ source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/tim
 
 
 
-##############Define two functions to easily establish or close parallel computations.##############
-parallel_start=function(){
-      library(doParallel)
-      if(detectCores()==4){core_num=detectCores()}else(core_num=detectCores()/2)
-      cluster_name<<-makeCluster(core_num)
-      registerDoParallel(cluster_name) 
-}
+############################
 
-parallel_stop=function(cluster_name=cluster_name){
-  stopCluster(cluster_name)
-  rm(cluster_name)
-  stopImplicitCluster()
-  gc()
-}
+# library(doParallel)
+# if(detectCores()==4){core_num=detectCores()}else(core_num=detectCores()/2)
+# cluster_name<<-makeCluster(core_num)
+# registerDoParallel(cluster_name)       
+# 
+# 
+# 
+# stopCluster(cluster_name)
+# rm(cluster_name)
+# stopImplicitCluster()
+# gc()
 
 ####################################################################################
 
@@ -36,22 +37,22 @@ parallel_stop=function(cluster_name=cluster_name){
 ## They are getting comparable results though. 
 ## Use Random whenever possible. 
 
-ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
+ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
   library(caret)
   # record the time
   timeRecordB()
   # change the trainControl for different metric. 
   switch(metric,
          Accuracy={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = 10, repeats = 1,sampling = sampling,search=search)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search)
          },Kappa={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = 10, repeats = 1,sampling = sampling,search=search)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search)
          },ROC={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = 10, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          },Sens={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = 10, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          },Spec={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = 10, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          }
   )
   
@@ -60,8 +61,8 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",t
   
   # train the function 
   # consider change the input into x and y in the future.
-  ml_with_sampling_preprocess=train(  x=train_data[,colnames(train_data)!=target]
-                                      , y=train_data[,colnames(train_data)==target]
+  ml_with_sampling_preprocess=train(  x=data[,colnames(train_data)!=target]
+                                      , y=data[,colnames(train_data)==target]
                                       , method=method
                                       , metric=metric
                                       , trControl=ctrl_with_sampling
@@ -84,7 +85,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",t
 
 # Add error handling to function ml_tune
 
-ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
+ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
   out=tryCatch(
     ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
             ,metric=metric
@@ -92,6 +93,7 @@ ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random
             ,search=search
             ,method=method
             ,summaryFunction=summaryFunction
+            ,k=k
     )
     
     ,error=function(e){
@@ -143,6 +145,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
     search=params%>%.[i,"search"]%>%as.character()
     tuneLength=params%>%.[i,"tuneLength"]%>%as.character() 
     metric=params%>%.[i,"metric"]%>%as.character()
+    k=params%>%.[i,"k"]%>%as.character()
     # model training part.
     # add tryCatch for error handling. 
     
@@ -150,6 +153,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
                               ,metric=metric
                               ,tuneLength=tuneLength
                               ,search=search
+                              ,k=k
                               ,method=method
                               ,summaryFunction = summaryFunction)
     
