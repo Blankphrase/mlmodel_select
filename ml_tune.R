@@ -61,8 +61,8 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   
   # train the function 
   # consider change the input into x and y in the future.
-  ml_with_sampling_preprocess=train(  x=data[,colnames(train_data)!=target]
-                                      , y=data[,colnames(train_data)==target]
+  ml_with_sampling_preprocess=train(  x=data[,colnames(data)!=target]
+                                      , y=data[,colnames(data)==target]
                                       , method=method
                                       , metric=metric
                                       , trControl=ctrl_with_sampling
