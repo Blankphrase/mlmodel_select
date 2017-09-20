@@ -80,8 +80,8 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 }
 
 # example use of ml_tune.
-
 # ml_tune(data=train_data,target = "is_open")
+
 
 # Add error handling to function ml_tune
 
@@ -108,11 +108,7 @@ ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random
   return(out)
 }
 
-# train_data%>%ml_tune_tc()
-
-# add functionality of saving global env to RData. 
-# ,filename=paste("Models",format(Sys.time(), "%F_%T"),".log",sep="")
-
+# train_data%>%ml_tune_tc(target="is_open")
 
 
 
@@ -174,56 +170,13 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 
 
 
-# example
-# params_grid1=expand.grid(sampling=c("up","down","smote","rose")
-#                          ,metric=c("ROC","Kappa","Accuracy")
-#                          ,method=c("xgbTree","xgbLinear","rf")
-#                          ,search="random"
-#                          ,preProcess=list(c("center","scale","pca"),c("center","scale"))
-#                          ,tuneLength=1 )
+## test ml_list function 
+# source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/ml_tune.R")
+# params_grid=expand.grid(sampling=c("up","down")
+#                         ,metric=c("ROC")
+#                         ,method=c("xgbLinear")
+#                         ,search="random"
+#                         ,tuneLength=1
+#                         ,k=10)
 # 
-# many_models1=ml_list(data=train_data,params=params_grid1)
-#  
-# timeRecordR()
-# 
-# timeRecordR()%>%filter(output_message!="None")%>%select(output_message,run_time)
-# 
-# many_models1[[1]]%>%predict(test_data)%>%confusionMatrix(test_data$is_open)
-##########################################################
-
-# Further test on values with Null. 
-
-
-# params_grid_test=expand.grid(sampling=c("up","down","smote","rose","NULL"),metric=c("ROC","Kappa","Accuracy"),method=c("xgbLinear","xgbTree","rf","ranger"), search="random", tuneLength=1,preProcess=list(c("center","scale","pca"),c("center","scale"),c("center","scale","ica"),c("NULL")))
-# test_model=ml_list(data=train_data,target="is_open",params=params_grid_test)
-# 
-# 
-# timeRecordR()%>%filter(output_message!="None")%>%select(output_message,run_time)
-
-
-#example use
-
-# 
-# parallel_start()
-# # Must write NULL into a character value.
-# params_grid=expand.grid(sampling=c("up","down","smote","rose","NULL"),metric=c("ROC","Kappa"),method=c("xgbTree","xgbLinear","rf"),search="random",tuneLength=1
-#                         )
-# 
-# many_models=ml_list(data=train_data,params = params_grid)
-# 
-# 
-# parallel_stop()
-# 
-# timeRecordR()%>%filter(output_message!="None")%>%select(output_message,run_time)
-
-
-# # end of training. 
-# 
-# 
-# ### Testing the model on test data.
-# library(magrittr)
-# library(caret)
-# xgbTree_ROC_up_random%>%predict(test_data)%>%confusionMatrix(test_data$is_open)
-# xgbTree_ROC_down_random%>%predict(test_data)%>%confusionMatrix(test_data$is_open)
-# xgbTree_ROC_smote_random%>%predict(test_data)%>%confusionMatrix(test_data$is_open)
-# xgbTree_ROC_rose_random%>%predict(test_data)%>%confusionMatrix(test_data$is_open)
+# ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
