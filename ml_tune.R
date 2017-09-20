@@ -1,8 +1,5 @@
 ## Wrapper for auto-tune xgbTree and xgbLinear function. 
 
-#data cleaning part.
-source('~/Dropbox/yelp/data_clean1.R')
-
 ## Load all the library dependencies here. 
 library(foreach)
 library(magrittr)
