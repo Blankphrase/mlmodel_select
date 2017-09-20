@@ -1,4 +1,4 @@
-## Wrapper for auto-tune xgbTree and xgbLinear function. 
+## Wrapper for auto-tune many ML algorithms supported by caret. 
 
 
 
@@ -70,7 +70,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   # collapse the vector for preprocessing to a single character. 
   preProcess=glue::collapse(preProcess,sep=" ")
   # The output message paste together. 
-  output_message=paste(method,sampling,metric,tuneLength,search,preProcess,"cv_num:",k,sep=" ")
+  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,search,preProcess,"cv_num:",k,sep=" ")
   # output the model that just finished training. 
   output_message%>%message()
   #record the time use. 
@@ -128,20 +128,20 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
     
     ### If there is sampling information in the params then give sampling that value, if sampling has a NULL character value, give it a NULL.
     if("sampling" %in% colnames(params) ){
-      sampling=params%>%.[i,"sampling"]%>%as.character()
+      sampling=params[i,"sampling"]%>%as.character()
       if(sampling=="NULL"){sampling=NULL}
     }else{sampling=NULL}
     # Do the same for preprocess variable.
     if("preProcess" %in% colnames(params) ){
-      preProcess=params%>%.[i,"preProcess"]%>%.[[1]]
+      preProcess=params[i,"preProcess"]%>%.[[1]]
       if(preProcess[1]=="NULL"){preProcess=NULL}
     }else{preProcess=NULL}
     
-    method=params%>%.[i,"method"]%>%as.character()
-    search=params%>%.[i,"search"]%>%as.character()
-    tuneLength=params%>%.[i,"tuneLength"]%>%as.character() 
-    metric=params%>%.[i,"metric"]%>%as.character()
-    k=params%>%.[i,"k"]%>%as.numeric()
+    method=params[i,"method"]%>%as.character()
+    search=params[i,"search"]%>%as.character()
+    tuneLength=params[i,"tuneLength"]%>%as.character() 
+    metric=params[i,"metric"]%>%as.character()
+    k=params[i,"k"]%>%as.numeric()
     # model training part.
     # add tryCatch for error handling. 
     
@@ -171,7 +171,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 
 
 ## test ml_list function 
-# source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/ml_tune.R")
+# 
 # params_grid=expand.grid(sampling=c("up","down")
 #                         ,metric=c("ROC")
 #                         ,method=c("xgbLinear")
