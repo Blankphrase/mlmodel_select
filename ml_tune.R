@@ -70,7 +70,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   # collapse the vector for preprocessing to a single character. 
   preProcess=glue::collapse(preProcess,sep=" ")
   # The output message paste together. 
-  output_message=paste(method,sampling,metric,tuneLength,search,preProcess,sep=" ")
+  output_message=paste(method,sampling,metric,tuneLength,search,preProcess,"cv_num:",k,sep=" ")
   # output the model that just finished training. 
   output_message%>%message()
   #record the time use. 
@@ -145,7 +145,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
     search=params%>%.[i,"search"]%>%as.character()
     tuneLength=params%>%.[i,"tuneLength"]%>%as.character() 
     metric=params%>%.[i,"metric"]%>%as.character()
-    k=params%>%.[i,"k"]%>%as.character()
+    k=params%>%.[i,"k"]%>%as.numeric()
     # model training part.
     # add tryCatch for error handling. 
     
