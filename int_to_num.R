@@ -9,7 +9,7 @@
 int_to_num=function(data){
   data=as.data.frame(data)
   library(magrittr)
-  data=as.data.frame(data)
+  column_names=colnames(data)
   
   sapply(data,class)%>%table()%>%print
   int_index=sapply(data,class)=="integer"
@@ -24,7 +24,7 @@ int_to_num=function(data){
   data[,!int_index]%>%sapply(class)%>%table
   
   data=cbind(data[,!int_index],int_features)
-  
+  colnames(data)=column_names
   data%>%sapply(class)%>%table%>%print
   return(data)
   
