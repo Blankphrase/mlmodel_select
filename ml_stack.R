@@ -32,7 +32,7 @@ prediction_matrix=function(base_model,data,target){
 
 source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/data_clean1.R")
 
-
+source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/int_to_num.R")
 
 
 ## how to do it if we have the base models.
@@ -41,23 +41,25 @@ models=readRDS("models.rds")
 
 train_predict_matrix=prediction_matrix(base_model=models,data=train_data,target = "is_open")
 
+train_predict_matrix=train_predict_matrix%>%int_to_num()
 
-
-predict_matrix%>%sapply(class)
+train_predict_matrix%>%sapply(class)
 params_grid=expand.grid(sampling=c("up","down","smote","rose")
-                        ,metric=c("ROC","Kappa")
-                        ,method=c("rf","glmnet","xgbTree","xgbLinear")
+                        ,metric=c("ROC")
+                        ,method=c("rf","glmnet","xgbTree","xgbLinear","ranger","svmRadial")
                         ,search="random"
                         ,tuneLength=5
-                        ,k=2)
+                        ,k=10)
 
-meta_models=ml_list(data=predict_matrix,target="true_label",params=params_grid)
+meta_models=ml_list(data=train_predict_matrix,target="true_label",params=params_grid)
 
 meta_models[[1]]%>%predict(train_predict_matrix)%>%confusionMatrix(train_predict_matrix$true_label)
 
 ## how to predict using the meta models. 
 ## Predict using base models first and combine the predictions and predict with the meta models. 
 test_predict_matrix=prediction_matrix(base_model=models,data=test_data,target = "is_open")
+test_predict_matrix=test_predict_matrix%>%int_to_num()
+
 meta_models[[1]]%>%predict(test_predict_matrix)%>%confusionMatrix(test_predict_matrix$true_label)
 
 
