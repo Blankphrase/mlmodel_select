@@ -12,49 +12,60 @@ source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/ml_
 
 
 
-ml_stack_predict=function(data,target,params,base_model="NULL"){
-  
-  
-  # If the base models are given, then do not re-train the base models. Just make prediction and train the meta models. 
-  if(base_model=="NULL"){
-    paste("Base models")%>%message()
-    # No base model is given. Need to train the base models. 
-    ## train the list of base models. 
-    base_model=ml_list(data=data,target=target,params = params)
-  
-   }else{
-     base_model=base_model
-  }
-  
-
+prediction_matrix=function(base_model,data,target){
     # predict on the data provided. 
-    base_prediction=foreach(j=1:nrow(params),.combine = cbind)%do%{
-      return( base_model[[j]]%>%predict(data)%>%as.character() )
+    base_prediction=foreach(j=1:length(base_model),.combine = cbind)%do%{
+      result_predictions=base_model[[j]]%>%predict(data)
+      return( result_predictions )
     }
-    
-    # combine the true label from the data
-    base_prediction=cbind(base_prediction, true_label=data[,colnames(data)==target]%>%as.character()  )
+    # change the matrix into data frame to avoid data type matching. 
     base_prediction=as.data.frame(base_prediction)
+    # combine the true label from the data
+    base_prediction=cbind(base_prediction, true_label=data[,colnames(data)==target])
+    
+    # base_prediction=as.data.frame(base_prediction)
     # print the summary of the prediction data. 
-    base_prediction%>%summary()%>%print() # This is the prediction matrix we get.
+    base_prediction%>%sapply(class)%>%print() # This is the prediction data frame we get.
   return(base_prediction)
 }
 
-params_grid=expand.grid(sampling=c("up","down")
-                        ,metric=c("ROC","Kappa")
-                        ,method=c("xgbLinear","xgbTree")
-                        ,search="random"
-                        ,tuneLength=1
-                        ,k=2)
 
-meta_models=ml_stack_predict(data=train_data,target="is_open",params = params_grid)
+source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/data_clean1.R")
 
-meta_models
+
+
 
 ## how to do it if we have the base models.
 
+models=readRDS("models.rds")
+
+train_predict_matrix=prediction_matrix(base_model=models,data=train_data,target = "is_open")
+
+
+
+predict_matrix%>%sapply(class)
+params_grid=expand.grid(sampling=c("up","down","smote","rose")
+                        ,metric=c("ROC","Kappa")
+                        ,method=c("rf","glmnet","xgbTree","xgbLinear")
+                        ,search="random"
+                        ,tuneLength=5
+                        ,k=2)
+
+meta_models=ml_list(data=predict_matrix,target="true_label",params=params_grid)
+
+meta_models[[1]]%>%predict(train_predict_matrix)%>%confusionMatrix(train_predict_matrix$true_label)
+
 ## how to predict using the meta models. 
+## Predict using base models first and combine the predictions and predict with the meta models. 
+test_predict_matrix=prediction_matrix(base_model=models,data=test_data,target = "is_open")
+meta_models[[1]]%>%predict(test_predict_matrix)%>%confusionMatrix(test_predict_matrix$true_label)
+
+
+
+
 
 ## how to evaluate the performance of meta models with cv. 
+## Once the above pipe line is done, we could do the cv easily. 
 
 
+## How to do multi-layer stacking?
