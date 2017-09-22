@@ -2,7 +2,7 @@
 # import the depedencies of stack modeling 
 source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/ml_tune.R")
 
-# In he future, we need to write it in a way so that we could select and compare different based models. 
+# In the future, we need to write it in a way so that we could select and compare different based models. 
 #####################################################
 ## Reproduce the stacking method from https://rasbt.github.io/mlxtend/user_guide/classifier/StackingClassifier/. 
 
@@ -21,7 +21,7 @@ prediction_matrix=function(base_model,data,target){
     # change the matrix into data frame to avoid data type matching. 
     base_prediction=as.data.frame(base_prediction)
     # combine the true label from the data
-    base_prediction=cbind(base_prediction, true_label=data[,colnames(data)==target])
+    base_prediction=cbind(base_prediction, true_label = data[,colnames(data)==target] )
     
     # base_prediction=as.data.frame(base_prediction)
     # print the summary of the prediction data. 
@@ -32,7 +32,7 @@ prediction_matrix=function(base_model,data,target){
 
 source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/data_clean1.R")
 
-source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/int_to_num.R")
+#source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/int_to_num.R")
 
 
 ## how to do it if we have the base models.
@@ -41,9 +41,16 @@ models=readRDS("models.rds")
 
 train_predict_matrix=prediction_matrix(base_model=models,data=train_data,target = "is_open")
 
-train_predict_matrix=train_predict_matrix%>%int_to_num()
+train_predict_matrix%>%sapply(class)
+
+train_predict_matrix%>%sapply(as.numeric)%>%as.data.frame()%>%sapply(class)
+
+train_predict_matrix$true_label=as.factor(train_predict_matrix$true_label)
 
 train_predict_matrix%>%sapply(class)
+colnames(train_predict_matrix)
+
+
 params_grid=expand.grid(sampling=c("up","down","smote","rose")
                         ,metric=c("ROC")
                         ,method=c("rf","glmnet","xgbTree","xgbLinear","ranger","svmRadial")
