@@ -7,27 +7,6 @@ source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/ml_
 ## Reproduce the stacking method from https://rasbt.github.io/mlxtend/user_guide/classifier/StackingClassifier/. 
 
 
-# The goal of this function ml_stack.train is to do stack model training easily in R.
-# The next function ml_stack.cv is to use corss validation to evaluate the stack model performance on unseen data. 
-
-
-
-prediction_matrix=function(base_model,data,target){
-    # predict on the data provided. 
-    base_prediction=foreach(j=1:length(base_model),.combine = cbind)%do%{
-      result_predictions=base_model[[j]]%>%predict(data)
-      return( result_predictions )
-    }
-    # change the matrix into data frame to avoid data type matching. 
-    base_prediction=as.data.frame(base_prediction)
-    # combine the true label from the data
-    base_prediction=cbind(base_prediction, true_label = data[,colnames(data)==target] )
-    
-    # base_prediction=as.data.frame(base_prediction)
-    # print the summary of the prediction data. 
-    base_prediction%>%sapply(class)%>%print() # This is the prediction data frame we get.
-  return(base_prediction)
-}
 
 
 source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/data_clean1.R")

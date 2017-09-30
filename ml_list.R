@@ -174,11 +174,33 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 
 ## test ml_list function 
 # 
-params_grid=expand.grid(sampling=c("up","down")
-                        ,metric=c("ROC")
-                        ,method=c("glmnet")
-                        ,search="random"
-                        ,tuneLength=5
-                        ,k=10,nthread=12)
+# params_grid=expand.grid(sampling=c("up","down")
+#                         ,metric=c("ROC")
+#                         ,method=c("glmnet")
+#                         ,search="random"
+#                         ,tuneLength=10
+#                         ,k=10,nthread=12)
+# 
+# ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
 
-ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
+
+#### The function below aims to make model stacking easier with pipeline by using the prediction matrix. 
+
+prediction_matrix=function(base_model,data,target){
+  # predict on the data provided. 
+  base_prediction=foreach(j=1:length(base_model),.combine = cbind)%do%{
+    result_predictions=base_model[[j]]%>%predict(data)
+    return( result_predictions )
+  }
+  # change the matrix into data frame to avoid data type matching. 
+  base_prediction=as.data.frame(base_prediction)
+  # combine the true label from the data
+  base_prediction=cbind(base_prediction, true_label = data[,colnames(data)==target] )
+  
+  # base_prediction=as.data.frame(base_prediction)
+  # print the summary of the prediction data. 
+  base_prediction%>%sapply(class)%>%print() # This is the prediction data frame we get.
+  return(base_prediction)
+}
+
+
