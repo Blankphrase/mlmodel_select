@@ -53,7 +53,7 @@ colnames(train_predict_matrix)
 
 params_grid=expand.grid(sampling=c("up","down","smote","rose")
                         ,metric=c("ROC")
-                        ,method=c("rf","glmnet","xgbTree","xgbLinear","ranger","svmRadial")
+                        ,method=c("rf","glmnet")
                         ,search="random"
                         ,tuneLength=5
                         ,k=10)
@@ -65,14 +65,10 @@ meta_models[[1]]%>%predict(train_predict_matrix)%>%confusionMatrix(train_predict
 ## how to predict using the meta models. 
 ## Predict using base models first and combine the predictions and predict with the meta models. 
 test_predict_matrix=prediction_matrix(base_model=models,data=test_data,target = "is_open")
-test_predict_matrix=test_predict_matrix%>%int_to_num()
-
-meta_models[[1]]%>%predict(test_predict_matrix)%>%confusionMatrix(test_predict_matrix$true_label)
 
 
-
-
-
+meta_models[[8]]%>%predict(test_predict_matrix)%>%confusionMatrix(test_predict_matrix$true_label)
+meta_models
 ## how to evaluate the performance of meta models with cv. 
 ## Once the above pipe line is done, we could do the cv easily. 
 

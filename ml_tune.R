@@ -12,33 +12,21 @@ library(dplyr)
 # source the timeRecord function dependency here
 source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/timeRecord_functions.R")
 
+## Goal: Auto-tune ml model with different sampling methods, different metric and etc.
 
-
-############################
-
-# library(doParallel)
-# if(detectCores()==4){core_num=detectCores()}else(core_num=detectCores()/2)
-# cluster_name<<-makeCluster(core_num)
-# registerDoParallel(cluster_name)       
-# 
-# 
-# 
-# stopCluster(cluster_name)
-# rm(cluster_name)
-# stopImplicitCluster()
-# gc()
-
-####################################################################################
-
-## Goal: Auto-tune xgbTree model with different sampling methods and different metric. 
-
-## When using grid search, there will be 3^tuneLength of the models being trained, plus eta is set to be 0.3
+## When using grid search, there will be N_hyper_params^tuneLength of the models being trained.
 ## When using random grid search, there will be tuneLength of models being trained, plus the eta is not set. 
 ## They are getting comparable results though. 
 ## Use Random whenever possible. 
 
-ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
+ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
+  # load the machine learning library. 
   library(caret)
+  # register parallel backend
+  library(doParallel)
+  cl=makeCluster(nthread)
+  registerDoParallel(cl)
+  
   # record the time
   timeRecordB()
   # change the trainControl for different metric. 
@@ -75,17 +63,21 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   output_message%>%message()
   #record the time use. 
   timeRecordB(output_message = output_message)
+  
+  
+  stopCluster(cl)
+  stopImplicitCluster()
   gc()
   return(ml_with_sampling_preprocess)
 }
 
 # example use of ml_tune.
-# ml_tune(data=train_data,target = "is_open")
+# ml_tune(data=train_data,method="rf",target = "is_open")
 
 
 # Add error handling to function ml_tune
 
-ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary){
+ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
   out=tryCatch(
     ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
             ,metric=metric
@@ -94,10 +86,11 @@ ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random
             ,method=method
             ,summaryFunction=summaryFunction
             ,k=k
+            ,nthread=nthread
     )
     
     ,error=function(e){
-      #echo the error message 
+      # echo the error message 
       message(e)
       # echo the specific model
       message(paste(method,sampling,metric,tuneLength,search,preProcess,sep=" "))
@@ -137,11 +130,19 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
       if(preProcess[1]=="NULL"){preProcess=NULL}
     }else{preProcess=NULL}
     
+    # give nthread a number of 4 if not specified. 
+    if("nthread" %in% colnames(params)){
+      nthread=params[i,"nthread"]%>%as.numeric()
+    }else{
+      nthread=4
+    }
+    
     method=params[i,"method"]%>%as.character()
     search=params[i,"search"]%>%as.character()
     tuneLength=params[i,"tuneLength"]%>%as.character() 
     metric=params[i,"metric"]%>%as.character()
     k=params[i,"k"]%>%as.numeric()
+    
     # model training part.
     # add tryCatch for error handling. 
     
@@ -150,6 +151,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
                               ,tuneLength=tuneLength
                               ,search=search
                               ,k=k
+                              ,nthread=nthread
                               ,method=method
                               ,summaryFunction = summaryFunction)
     
@@ -172,11 +174,11 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 
 ## test ml_list function 
 # 
-# params_grid=expand.grid(sampling=c("up","down")
-#                         ,metric=c("ROC")
-#                         ,method=c("xgbLinear")
-#                         ,search="random"
-#                         ,tuneLength=1
-#                         ,k=10)
-# 
-# ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
+params_grid=expand.grid(sampling=c("up","down")
+                        ,metric=c("ROC")
+                        ,method=c("glmnet")
+                        ,search="random"
+                        ,tuneLength=5
+                        ,k=10,nthread=12)
+
+ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
