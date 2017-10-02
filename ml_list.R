@@ -197,9 +197,9 @@ prediction_matrix=function(base_model,data,target){
   # combine the true label from the data
   base_prediction=cbind(base_prediction, true_label = data[,colnames(data)==target] )
   
-  base_prediction=base_prediction%>%sapply(as.double)%>%as.data.frame()%>%sapply(class)
+  base_prediction=base_prediction%>%sapply(as.double)%>%as.data.frame()
   
-  base_prediction$true_label=as.factor(base_prediction$true_label)
+  # base_prediction$true_label=as.factor(base_prediction$true_label)
   # base_prediction=as.data.frame(base_prediction)
   # print the summary of the prediction data. 
   base_prediction%>%sapply(class)%>%print() # This is the prediction data frame we get.
