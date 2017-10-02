@@ -17,14 +17,12 @@ source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/da
 ### First step, train the base models.
 
 
-
-
-
-
-
 ## how to do it if we have the base models.
 
 models=readRDS("models.rds")
+
+
+
 # resample the models for visual comparison
 models_for_compare=resamples(models)
 bwplot(models_for_compare)
@@ -37,6 +35,7 @@ train_predict_matrix=prediction_matrix(base_model=models,data=train_data,target 
 # train_predict_matrix%>%sapply(class)
 # 
 
+train_predict_matrix%>%sapply(as.double)%>%as.data.frame()%>%sapply(class)
 
 train_predict_matrix%>%sapply(class)
 colnames(train_predict_matrix)
@@ -44,14 +43,15 @@ colnames(train_predict_matrix)
 
 params_grid=expand.grid(sampling=c("up","down","smote","rose")
                         ,metric=c("ROC")
-                        ,method=c("rf","glmnet","xgbLinear")
+                        ,method=c("xgbLinear","glmnet","rf")
                         ,search="random"
                         ,tuneLength=5
-                        ,k=10, nthread=2)
-
+                        ,k=10, nthread=10)
+# give rf method only 5 cores to do the calculation since more cores would leads to memory overflow. 
+params_grid[params_grid[,"method"]=="rf","nthread"]=5
+# train the meta models.
 meta_models=ml_list(data=train_predict_matrix,target="true_label",params=params_grid)
 
-meta_models[[1]]%>%predict(train_predict_matrix)%>%confusionMatrix(train_predict_matrix$true_label)
 
 resamples_meta_models=resamples(meta_models)
 bwplot(resamples_meta_models)
