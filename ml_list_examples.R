@@ -15,7 +15,16 @@ source("https://raw.githubusercontent.com/edwardcooper/yelp_datamining/master/da
 #source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/int_to_num.R")
 
 ### First step, train the base models.
-
+params_grid=expand.grid(sampling=c("up","down","smote","rose")
+                        ,metric=c("ROC")
+                        ,method=c("xgbTree")
+                        ,search="random"
+                        ,tuneLength=5
+                        ,k=10, nthread=10)
+# give rf method only 5 cores to do the calculation since more cores would leads to memory overflow. 
+params_grid[params_grid[,"method"]=="rf","nthread"]=5
+# train the meta models.
+meta_models=ml_list(data=train_predict_matrix,target="true_label",params=params_grid)
 
 ## how to do it if we have the base models.
 
@@ -28,22 +37,20 @@ models_for_compare=resamples(models)
 bwplot(models_for_compare)
 
 
-# make the prediction from the base models and combine them into 
+# make the prediction from the base models and combine them into a single dataframe. 
 train_predict_matrix=prediction_matrix(base_model=models,data=train_data,target = "is_open")
 
 
 # train_predict_matrix%>%sapply(class)
-# 
 
-train_predict_matrix%>%sapply(as.double)%>%as.data.frame()%>%sapply(class)
-
-train_predict_matrix%>%sapply(class)
+train_predict_matrix%>%head
 colnames(train_predict_matrix)
-
+# It is not a good idea to put all calculations into a single workflow. At each step of the calculations, you will need to save the results. 
+# Do the data manipulation and cleaning for next step stacked models.
 
 params_grid=expand.grid(sampling=c("up","down","smote","rose")
                         ,metric=c("ROC")
-                        ,method=c("xgbLinear","glmnet","rf")
+                        ,method=c("xgbTree")
                         ,search="random"
                         ,tuneLength=5
                         ,k=10, nthread=10)
