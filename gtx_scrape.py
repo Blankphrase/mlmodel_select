@@ -2,8 +2,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 import re
 import pandas as pd
-# set the url
-
+import time
 def newegg_gtx_scrape(filename,url):
     # Read the page into python with urlopen. Then close the connection afterwards.
     urlClient=urlopen(myURL1)
@@ -33,11 +32,14 @@ def newegg_gtx_scrape(filename,url):
         price=regex_value("\d{3}.{0,1}",gtx1080_item.findAll("strong")[-1].text)
         if price=="NA":
             price=regex_value("\d{3}.{0,1}",gtx1080_item.findAll("strong")[-3].text)
-        gpu_info=[brand,gpu_type,mem_size,mem_type,price]
+        ship=gtx1080_item.findAll("li",{"class":"price-ship"})[0].get_text().strip()
+        http_adr=gtx1080_item.a["href"]
+        gpu_info=[brand,gpu_type,mem_size,mem_type,price,ship,http_adr]
         GPU_info.append(gpu_info)
     # write the information into a csv file.
     GPU_info=pd.DataFrame(GPU_info)
     GPU_info.to_csv(filename, index=False, mode='a', header=False)
+    time.sleep(9)
 
 # scrape the information here.
 myURL1="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=gtx+1080&ignorear=0&N=-1&isNodeId=1"
