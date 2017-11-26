@@ -2,7 +2,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 import re
 import pandas as pd
-
+# set the url
 
 def newegg_gtx_scrape(filename,url):
     # Read the page into python with urlopen. Then close the connection afterwards.
@@ -40,9 +40,19 @@ def newegg_gtx_scrape(filename,url):
     GPU_info.to_csv(filename, index=False, mode='a', header=False)
 
 # scrape the information here.
-# set the url
 myURL1="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=gtx+1080&ignorear=0&N=-1&isNodeId=1"
+myURL2="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=gtx+1070&ignorear=0&N=-1&isNodeId=1"
+myURL3="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&DEPA=0&Order=BESTMATCH&Description=gtx+1060&ignorear=0&N=-1&isNodeId=1"
+
 newegg_gtx_scrape(filename="gtx1080_newegg.csv",url=myURL1)
+newegg_gtx_scrape(filename="gtx1080_newegg.csv",url=myURL2)
+newegg_gtx_scrape(filename="gtx1080_newegg.csv",url=myURL3)
+
+
 for i in [2,3,4]:
-    url="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=-1&IsNodeId=1&Description=gtx%201080&bop=And&Page={0}&PageSize=36&order=BESTMATCH".format(i)
-    newegg_gtx_scrape(filename="gtx1080_newegg.csv", url=url)
+    url1="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=-1&IsNodeId=1&Description=gtx%201080&bop=And&Page={0}&PageSize=36&order=BESTMATCH".format(i)
+    url2="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=-1&IsNodeId=1&Description=gtx%201070&bop=And&Page={0}&PageSize=36&order=BESTMATCH".format(i)
+    url3="https://www.newegg.com/Product/ProductList.aspx?Submit=ENE&N=-1&IsNodeId=1&Description=gtx%201060&bop=And&Page={0}&PageSize=36&order=BESTMATCH".format(i)
+    newegg_gtx_scrape(filename="gtx1080_newegg.csv", url=url1)
+    newegg_gtx_scrape(filename="gtx1080_newegg.csv", url=url2)
+    newegg_gtx_scrape(filename="gtx1080_newegg.csv", url=url3)
