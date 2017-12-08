@@ -94,7 +94,7 @@ ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random
       message(e)
       # echo the specific model
       message(paste(method,sampling,metric,tuneLength,search,preProcess,sep=" "))
-      return(NA)
+      return(list(NA))
     }
     
   )
