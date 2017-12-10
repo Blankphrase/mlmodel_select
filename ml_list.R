@@ -74,32 +74,33 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 # example use of ml_tune.
 # ml_tune(data=train_data,method="rf",target = "is_open")
 
-
+#========================================================================
 # Add error handling to function ml_tune
+# update: pass the error handling into foreach instead of here. 
 
-ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
-  out=tryCatch(
-    ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
-            ,metric=metric
-            ,tuneLength=tuneLength
-            ,search=search
-            ,method=method
-            ,summaryFunction=summaryFunction
-            ,k=k
-            ,nthread=nthread
-    )
-    
-    ,error=function(e){
-      # echo the error message 
-      message(e)
-      # echo the specific model
-      message(paste(method,sampling,metric,tuneLength,search,preProcess,sep=" "))
-      return(NULL)
-    }
-    
-  )
-  return(out)
-}
+# ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
+#   out=tryCatch(
+#     ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
+#             ,metric=metric
+#             ,tuneLength=tuneLength
+#             ,search=search
+#             ,method=method
+#             ,summaryFunction=summaryFunction
+#             ,k=k
+#             ,nthread=nthread
+#     )
+#     
+#     ,error=function(e){
+#       # echo the error message 
+#       message(e)
+#       # echo the specific model
+#       message(paste(method,sampling,metric,tuneLength,search,preProcess,sep=" "))
+#       return(NULL)
+#     }
+#     
+#   )
+#   return(out)
+# }
 
 # train_data%>%ml_tune_tc(target="is_open")
 
@@ -117,7 +118,8 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
   
   
   # just do not add the .combine=list sovles the strange list structure.
-  model_list=foreach(i=1:nrow(params),.packages = c("caret","magrittr"))%do%{
+  # remove the output if there is an error in training the model. .errorhandling = "remove". See https://cran.r-project.org/web/packages/foreach/foreach.pdf for details. 
+  model_list=foreach(i=1:nrow(params),.packages = c("caret","magrittr"),.errorhandling = "remove")%do%{
     
     ### If there is sampling information in the params then give sampling that value, if sampling has a NULL character value, give it a NULL.
     if("sampling" %in% colnames(params) ){
@@ -146,7 +148,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
     # model training part.
     # add tryCatch for error handling. 
     
-    ml_model_train=ml_tune_tc(data=data,target=target,sampling=sampling,preProcess=preProcess
+    ml_model_train=ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
                               ,metric=metric
                               ,tuneLength=tuneLength
                               ,search=search
