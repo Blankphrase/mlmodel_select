@@ -185,6 +185,34 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 # 
 # ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
 
+########################################################################################################################33
+
+# Functions to do model selection
+
+## plot the model performance for models with different metrics. 
+ml_bwplot=function(models){
+  # get the metrics from the caret model list. 
+  model_metrics=models%>%lapply( function(model_list){model_list$metric})%>%unlist
+  # plot the model performance for metric-group ROC,Sens,Spec and/or Accuracy, Kappa. 
+  # decide the number of plots a.k.a groups
+  # if there are two groups then find their indexes and get the models for differnt group. 
+  # if there is one group, then just plot it. 
+  if(c("ROC","Sens","Spec") %in% model_metrics && c("Accuracy","Kappa") %in% model_metrics){
+    # if the model selection does not depend on model correlation. a.k.a the cor_level is null. 
+    
+    models[model_metrics %in% c("ROC","Sens","Spec")]%>%resamples%>%bwplot%>%print
+    
+    models[model_metrics %in% c("Accuracy","Kappa")]%>%resamples%>%bwplot%>%print
+  }else{
+    models%>%resamples%>%bwplot%>%print
+  }
+  
+}
+
+
+
+
+#########################################################################################################################
 
 #### The function below aims to make model stacking easier with pipeline by using the prediction matrix. 
 
