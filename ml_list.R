@@ -178,6 +178,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
 # 
 # params_grid=expand.grid(sampling=c("up","down")
 #                         ,metric=c("ROC")
+#                         ,preProcess=c("center","scale")
 #                         ,method=c("glmnet")
 #                         ,search="random"
 #                         ,tuneLength=10
@@ -209,6 +210,8 @@ ml_bwplot=function(models){
   
 }
 
+# example use of ml_bwplot
+# ml_bwplot(testmodels_churn)
 
 
 
