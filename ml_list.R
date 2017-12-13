@@ -211,7 +211,7 @@ ml_bwplot=function(models){
 # example use of ml_bwplot
 # ml_bwplot(testmodels_churn)
 
-ml_metric_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
+ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
   # get all the metrics in the model list
   model_metrics=models%>%lapply( function(model_list){model_list$metric})%>%unlist
   # if the metric is in the model_metrics, then select the models based on minimum value of the metric
@@ -283,13 +283,13 @@ ml_metric_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
 # the supported metrics are ROC,Sens,Spec,Accuracy,Kappa. 
 # example use to select models based on metric. 
 # this select models that has a minimum of 0.75 median accuracy 
-# testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="Accuracy",mini=0.75,FUN=median)
+# testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=median)
 # this select models that has a minimum accuracy of 0.75
-# testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="Accuracy",mini=0.75,FUN=min)
+# testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=min)
 # this select models that has a minimum standard deviation of 0.01
-# testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="Accuracy",mini=0.75,FUN=sd)
+# testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=sd)
 # select models that has a minimum ROC median of 0.84 and a maximum ROC standard deviation of 0.017
-# testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="ROC",mini=0.84,FUN=median)%>%ml_metric_filter(metric="ROC",max=0.017,FUN=sd)
+# testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="ROC",mini=0.84,FUN=median)%>%ml_cv_filter(metric="ROC",max=0.017,FUN=sd)
 # you could use custom functions to calculate a statistic for a k-fold performance metric
 # This function used the performance metrics after feed the model into resamples function in caret package. You could get the same dataframe with model_list%>%resamples%>%.$values.
 
