@@ -290,6 +290,8 @@ ml_metric_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
 # testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="Accuracy",mini=0.75,FUN=sd)
 # select models that has a minimum ROC median of 0.84 and a maximum ROC standard deviation of 0.017
 # testmodels_metric_filtered=testmodels_churn%>%ml_metric_filter(metric="ROC",mini=0.84,FUN=median)%>%ml_metric_filter(metric="ROC",max=0.017,FUN=sd)
+# you could use custom functions to calculate a statistic for a k-fold performance metric
+# This function used the performance metrics after feed the model into resamples function in caret package. You could get the same dataframe with model_list%>%resamples%>%.$values.
 
 #########################################################################################################################
 
