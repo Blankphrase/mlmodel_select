@@ -282,14 +282,16 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
 
 # the supported metrics are ROC,Sens,Spec,Accuracy,Kappa. 
 # example use to select models based on metric. 
-# this select models that has a minimum of 0.75 median accuracy 
+# this select models that has a cv minimum of 0.75 median accuracy 
 # testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=median)
-# this select models that has a minimum accuracy of 0.75
+# this select models that has a cv minimum accuracy of 0.75
 # testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=min)
-# this select models that has a minimum standard deviation of 0.01
+# this select models that has a cv minimum standard deviation of 0.01
 # testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="Accuracy",mini=0.75,FUN=sd)
-# select models that has a minimum ROC median of 0.84 and a maximum ROC standard deviation of 0.017
+# select models that has a cv minimum ROC median of 0.84 and a maximum ROC standard deviation of 0.017
 # testmodels_metric_filtered=testmodels_churn%>%ml_cv_filter(metric="ROC",mini=0.84,FUN=median)%>%ml_cv_filter(metric="ROC",max=0.017,FUN=sd)
+# select models that has a cv median ROC value between 0.84 and 0.84275. 
+# testmodels_metric_filtered=testmodels_churn%>%filter_model(metric="ROC",mini=0.84,max=0.84275,FUN=median)
 # you could use custom functions to calculate a statistic for a k-fold performance metric
 # This function used the performance metrics after feed the model into resamples function in caret package. You could get the same dataframe with model_list%>%resamples%>%.$values.
 
