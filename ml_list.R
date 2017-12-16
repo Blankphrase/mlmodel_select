@@ -19,7 +19,7 @@ source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/tim
 ## They are getting comparable results though. 
 ## Use Random whenever possible. 
 
-ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
+ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,repeats=1,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
   # load the machine learning library. 
   library(caret)
   # register parallel backend
@@ -32,15 +32,15 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   # change the trainControl for different metric. 
   switch(metric,
          Accuracy={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = repeats,sampling = sampling,search=search)
          },Kappa={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = repeats,sampling = sampling,search=search)
          },ROC={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = repeats,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          },Sens={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = repeats,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          },Spec={
-           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = 1,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
+           ctrl_with_sampling<- trainControl(method = "repeatedcv",number = k, repeats = repeats,sampling = sampling,search=search,classProbs = TRUE,summaryFunction = summaryFunction)
          }
   )
   
@@ -211,6 +211,10 @@ ml_bwplot=function(models){
 # example use of ml_bwplot
 # ml_bwplot(testmodels_churn)
 
+#==============================================================================================================================================================
+
+
+# A function to filter models based on performance metrics from cross-validation. 
 ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
   # get all the metrics in the model list
   model_metrics=models%>%lapply( function(model_list){model_list$metric})%>%unlist
@@ -219,7 +223,7 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
                                        ,"Try using metrics:",glue::collapse(unique(model_metrics),sep=", ") )%>%stop() }
   
   
-  # ==============================================================================================================================
+  # ==================================
   # define a function to filter models. 
   filter_model=function(model,metric,FUN,mini=NULL,max=NULL){
     # model%>%resamples%>%.$values%>%print
@@ -261,7 +265,7 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
     
     return(filtered_model_from_metric)
   }
-  # ==============================================================================================================================
+  # ==================================
   
   # select models based on which metric group the metric is in.  
   # if ROC is in that list, then it will return the second option.
