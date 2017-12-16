@@ -56,7 +56,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   # collapse the vector for preprocessing to a single character. 
   preProcess=glue::collapse(preProcess,sep=" ")
   # The output message paste together. 
-  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,search,preProcess,"cv_num:",k,sep=" ")
+  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,search,preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
   # output the model that just finished training. 
   output_message%>%message()
   #record the time use. 
@@ -102,6 +102,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 
 # train_data%>%ml_tune_tc(target="is_open")
 
+#========================================================================
 
 
 # ### A function to auto-train and store models into a list. 
@@ -130,18 +131,24 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
       if(preProcess[1]=="NULL"){preProcess=NULL}
     }else{preProcess=NULL}
     
-    # give nthread a number of 4 if not specified. 
+    # give nthread a number of 4 if not specified. Since most desktop or more powerful laptops have four cores. 
     if("nthread" %in% colnames(params)){
       nthread=params[i,"nthread"]%>%as.numeric()
     }else{
       nthread=4
     }
-    
+    # give repeats a default number 1 if not specified. 
+    if("repeats" %in% colnames(params)){
+      repeats=params[i,"repeats"]%>%as.numeric()
+    }else{
+      repeats=1
+    }
     method=params[i,"method"]%>%as.character()
     search=params[i,"search"]%>%as.character()
     tuneLength=params[i,"tuneLength"]%>%as.character() 
     metric=params[i,"metric"]%>%as.character()
     k=params[i,"k"]%>%as.numeric()
+    
     
     # model training part.
     # add tryCatch for error handling. 
@@ -150,6 +157,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
                               ,metric=metric
                               ,tuneLength=tuneLength
                               ,search=search
+                              ,repeats = repeats
                               ,k=k
                               ,nthread=nthread
                               ,method=method
