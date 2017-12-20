@@ -226,9 +226,9 @@ ml_bwplot=function(models){
 ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
   # get all the metrics in the model list
   model_metrics=models%>%lapply( function(model_list){model_list$metric})%>%unlist
-  # if the metric is in the model_metrics, then select the models based on minimum value of the metric
-  if(!metric %in% model_metrics){paste("There is no metric, ",metric,", in the model performance. "
-                                       ,"Try using metrics:",glue::collapse(unique(model_metrics),sep=", ") )%>%stop() }
+  # if the metric is in the model_metrics, then select the models based on minimum value of the metric.
+  # if(!metric %in% model_metrics){paste("There is no metric, ",metric,", in the model performance. "
+  #                                     ,"Try using metrics:",glue::collapse(unique(model_metrics),sep=", ") )%>%stop() }
   
   
   # ==================================
@@ -385,7 +385,7 @@ prediction_matrix=function(base_model,data,target){
   }
   # change the matrix into data frame to avoid data type matching. 
   base_prediction=as.data.frame(base_prediction)
-  base_prediction=base_prediction%>%sapply(as.double)%>%as.data.frame()
+  base_prediction=base_prediction%>%apply(2,as.double)%>%as.data.frame()
   # combine the true label from the data
   base_prediction=cbind(base_prediction, true_label = data[,colnames(data)==target] )
   
