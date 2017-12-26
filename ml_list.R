@@ -72,37 +72,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 # example use of ml_tune.
 # ml_tune(data=train_data,method="rf",target = "is_open")
 
-#========================================================================
-# Add error handling to function ml_tune
-# update: pass the error handling into foreach instead of here. 
 
-# ml_tune_tc=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k=10,tuneLength=2,method="xgbLinear",preProcess=NULL,summaryFunction=twoClassSummary,nthread=4){
-#   out=tryCatch(
-#     ml_tune(data=data,target=target,sampling=sampling,preProcess=preProcess
-#             ,metric=metric
-#             ,tuneLength=tuneLength
-#             ,search=search
-#             ,method=method
-#             ,summaryFunction=summaryFunction
-#             ,k=k
-#             ,nthread=nthread
-#     )
-#     
-#     ,error=function(e){
-#       # echo the error message 
-#       message(e)
-#       # echo the specific model
-#       message(paste(method,sampling,metric,tuneLength,search,preProcess,sep=" "))
-#       return(NULL)
-#     }
-#     
-#   )
-#   return(out)
-# }
-
-# train_data%>%ml_tune_tc(target="is_open")
-
-#========================================================================
 
 
 # ### A function to auto-train and store models into a list. 
@@ -170,11 +140,11 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
     paste("Finished training: ",i,"/",nrow(params),sep="")%>%message()
     
     
-    # save the model to disk.
+    # save each model to disk.
     # ======================================
     # change the preprocess vector into a single chr. 
     preProcess=glue::collapse(preProcess,sep="_")
-    file_name=paste(method,sampling,preProcess,i,metric,sep="_")
+    file_name=paste(i,method,sampling,preProcess,metric,sep="_")
     # if the save_model is not null, then save each model 
     if(!is.null(save_model)){ 
       # Use the save_model string as the name for the subdirectory to store each models.
@@ -186,7 +156,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
       # save the models 
       saveRDS(ml_model_train,file=paste(file_name,".rds",sep="")) 
     }
-    
+    # ====================================================
     return(ml_model_train)
   }
   
@@ -202,14 +172,14 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
 ## test ml_list function 
 # 
 # params_grid=expand.grid(sampling=c("up","down")
-#                         ,metric=c("ROC")
-#                         ,preProcess=c("zv","nzv","center","scale")
-#                         ,method=c("glmnet")
+#                         ,metric=c("ROC","Accuracy","Kappa","Sens","Spec")
+#                         ,preProcess=list(c("zv","nzv","center","scale"),c("center","scale"))
+#                         ,method=c("glmnet","glm","bayesglm")
 #                         ,search="random"
 #                         ,tuneLength=10
-#                         ,k=10,nthread=10)
+#                         ,k=10,nthread=4)
 # 
-# ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary)
+# ml_list(data=train_data,target = "is_open",params = params_grid,summaryFunction=twoClassSummary,save_model="test_models")
 
 ########################################################################################################################33
 
