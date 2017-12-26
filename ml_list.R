@@ -107,7 +107,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 
 # ### A function to auto-train and store models into a list. 
 
-ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=FALSE){
+ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=NULL){
   timeRecordB()
   # print the total numbers of models to be trained.
   print(paste("Total training model(s):",sum(params[,"tuneLength"]),sep=" " ))
