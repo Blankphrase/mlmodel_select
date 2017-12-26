@@ -24,8 +24,11 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   library(caret)
   # register parallel backend
   library(doParallel)
-  cl=makeCluster(nthread)
-  registerDoParallel(cl)
+  # cl=makeCluster(nthread)
+  registerDoParallel(cores=nthread)
+  
+  # if the method name contains h2o then it is essential to initialize the h2o 
+  if(grepl(pattern="h2o",method)){ h2o.init(nthreads=nthread) }
   
   # record the time
   timeRecordB()
@@ -56,14 +59,14 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   # collapse the vector for preprocessing to a single character. 
   preProcess=glue::collapse(preProcess,sep=" ")
   # The output message paste together. 
-  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,search,preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
+  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,"search:",search,"preProcess:",preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
   # output the model that just finished training. 
   output_message%>%message()
   #record the time use. 
   timeRecordB(output_message = output_message)
   
   
-  stopCluster(cl)
+  # stopCluster(cl)
   stopImplicitCluster()
   gc()
   return(ml_with_sampling_preprocess)
