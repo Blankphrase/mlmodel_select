@@ -168,8 +168,13 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
     #paste(method,metric,tuneLength,search,sampling,preProcess,sep=" ")%>%message()
     #print the number of models that have been trained.
     paste("Finished training: ",i,"/",nrow(params),sep="")%>%message()
-    #save the model to disk.
-    file_name=paste(method,sampling,preProcess,i,sep="_")
+    
+    
+    # save the model to disk.
+    # ======================================
+    # change the preprocess vector into a single chr. 
+    preProcess=glue::collapse(preProcess,sep="_")
+    file_name=paste(method,sampling,preProcess,i,metric,sep="_")
     # if the save_model is not null, then save each model 
     if(!is.null(save_model)){ 
       # Use the save_model string as the name for the subdirectory to store each models.
@@ -185,7 +190,8 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
     return(ml_model_train)
   }
   
-  if(!is.null(save_model)){ saveRDS(ml_model_train,file=paste(save_model,".rds",sep="") ) }
+  # finally save the entire model list to disk. 
+  if(!is.null(save_model)){ saveRDS(model_list,file=paste(save_model,".rds",sep="") ) }
   
   return(model_list)
 }
