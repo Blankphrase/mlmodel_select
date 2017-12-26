@@ -169,7 +169,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
     #print the number of models that have been trained.
     paste("Finished training: ",i,"/",nrow(params),sep="")%>%message()
     #save the model to disk.
-    file_name=paste(method,sampling,preProcess,sep="_")
+    file_name=paste(method,sampling,preProcess,i,sep="_")
     # if the save_model is not null, then save each model 
     if(!is.null(save_model)){ 
       # Use the save_model string as the name for the subdirectory to store each models.
