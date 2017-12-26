@@ -106,8 +106,8 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
 
 
 # ### A function to auto-train and store models into a list. 
-# 
-ml_list=function(data,target,params,summaryFunction=twoClassSummary){
+
+ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=FALSE){
   timeRecordB()
   # print the total numbers of models to be trained.
   print(paste("Total training model(s):",sum(params[,"tuneLength"]),sep=" " ))
@@ -117,7 +117,8 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
   
   
   # just do not add the .combine=list sovles the strange list structure.
-  # remove the output if there is an error in training the model. .errorhandling = "remove". See https://cran.r-project.org/web/packages/foreach/foreach.pdf for details. 
+  # remove the output if there is an error in training the model. .errorhandling = "remove". 
+  # See https://cran.r-project.org/web/packages/foreach/foreach.pdf for details. 
   model_list=foreach(i=1:nrow(params),.packages = c("caret","magrittr"),.errorhandling = "remove")%do%{
     
     ### If there is sampling information in the params then give sampling that value, if sampling has a NULL character value, give it a NULL.
@@ -167,12 +168,24 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary){
     #paste(method,metric,tuneLength,search,sampling,preProcess,sep=" ")%>%message()
     #print the number of models that have been trained.
     paste("Finished training: ",i,"/",nrow(params),sep="")%>%message()
-    #save the model to the file.
-    
-    
+    #save the model to disk.
+    file_name=paste(method,sampling,preProcess,sep="_")
+    # if the save_model is not null, then save each model 
+    if(!is.null(save_model)){ 
+      # Use the save_model string as the name for the subdirectory to store each models.
+      dir_path=paste("./",save_model,sep="")
+      # If the dir_path does not exist, create a subdirectory. 
+      if(!dir.exists(dir_path)){  dir.create(dir_path)  }
+      # save the models to that subdirectory with file_name. 
+      file_name=paste(dir_path,"/",file_name,sep="")
+      # save the models 
+      saveRDS(ml_model_train,file=paste(file_name,".rds",sep="")) 
+    }
     
     return(ml_model_train)
   }
+  
+  if(!is.null(save_model)){ saveRDS(ml_model_train,file=paste(save_model,".rds",sep="") ) }
   
   return(model_list)
 }
