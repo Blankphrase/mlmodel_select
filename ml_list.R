@@ -391,3 +391,39 @@ prediction_matrix=function(base_model,data,target){
 }
 
 
+##################################################################################################################################
+# function to check and install packages. 
+
+# check and install missing package dependencies from a vector of model names.  
+install_pkg_model_names=function(model_names){
+  
+  model_names=unique(model_names)
+  pkg_names=foreach::foreach(i=seq_along(model_names),.combine=c)%do%{
+    caret::getModelInfo()[[model_names[i]]]$library
+  }
+  
+  # check for the difference between required package and installed packages. 
+  missing_pkgs=setdiff(unique(pkg_names),rownames(installed.packages()))
+  if( length( missing_pkgs )>0    ){
+    message(paste("Trying to install packages:",missing_pkgs,"\n"))
+    install.packages(missing_pkgs)
+  }else{
+    message("No missing package dependency.")
+  }
+}
+# example use 
+# install_pkg_model_names(c("xgbTree","deepboost"))
+# install_pkg_model_names(params_grid$method)
+
+# check and install missing pacakge dependencies from a list of trained caret models. 
+
+install_pkg_model_list=function(models){
+  model_libs=foreach::foreach(i=seq_along(models),.combine = c)%do%{
+    models[[i]]$modelInfo$library
+  }
+  install_pkg_model_names(model_libs)
+}
+
+
+#install_pkg_model_list(models=down_sampling_models)
+
