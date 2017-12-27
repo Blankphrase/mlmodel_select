@@ -205,7 +205,7 @@ ml_bwplot=function(models){
   }else{
     models%>%resamples%>%bwplot%>%print
   }
-  
+  return(models)
 }
 
 # example use of ml_bwplot
