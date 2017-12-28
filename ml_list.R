@@ -406,11 +406,17 @@ install_pkg_model_names=function(model_names){
   missing_pkgs=setdiff(unique(pkg_names),rownames(installed.packages()))
   if( length( missing_pkgs )>0    ){
     message(paste("Trying to install packages:",missing_pkgs,"\n"))
+    if("bnclassify" %in% missing_pkgs){
+      # need to install some bioconductor dependencies. 
+      source("http://bioconductor.org/biocLite.R")
+      biocLite(c("graph", "RBGL", "Rgraphviz"))
+    }
     install.packages(missing_pkgs)
   }else{
     message("No missing package dependency.")
   }
 }
+
 # example use 
 # install_pkg_model_names(c("xgbTree","deepboost"))
 # install_pkg_model_names(params_grid$method)
@@ -425,5 +431,23 @@ install_pkg_model_list=function(models){
 }
 
 
-#install_pkg_model_list(models=down_sampling_models)
+# install_pkg_model_list(models=down_sampling_models)
 
+# give models a meaningful names for comaprison. 
+assign_model_names=function(models){
+  model_names=foreach::foreach(i=seq_along(models))%do%{
+    method=models[[i]]$method
+    metric=models[[i]]$metric
+    preProcess=models[[i]]$preProcess$method%>%names
+    sampling=models[[i]]$control$sampling$name
+    preProcess=glue::collapse(preProcess,sep="_")
+    model_name=paste(i,method,sampling,preProcess,metric,sep="_")
+    return(model_name)
+  }
+  names(models)=model_names
+  return(models)
+}
+
+
+# example use 
+# down_sampling_models= assign_model_names(down_sampling_models)
