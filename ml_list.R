@@ -31,11 +31,11 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
     library(h2o)
     h2o.init(nthreads=nthread) }
   # set the number of cores to 1 for some algorithms. 
-  if(method=="OneR"| method=="LMT"){
+  if(method %in% c("OneR","LMT","mlpKerasDecay","mlpKerasDecayCost","mlpKerasDropout") ){
     nthread=1
   }
-  # cl=makeCluster(nthread)
-  registerDoParallel(cores=nthread)
+  cl=makeCluster(nthread)
+  registerDoParallel(cl)
   
   # record the time
   timeRecordB()
@@ -73,7 +73,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   timeRecordB(output_message = output_message)
   
   
-  # stopCluster(cl)
+  stopCluster(cl)
   stopImplicitCluster()
   gc()
   return(ml_with_sampling_preprocess)
