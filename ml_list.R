@@ -24,13 +24,18 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   library(caret)
   # register parallel backend
   library(doParallel)
-  # cl=makeCluster(nthread)
-  registerDoParallel(cores=nthread)
+  
   
   # if the method name contains h2o then it is essential to initialize the h2o 
   if(grepl(pattern="h2o",method)){ 
     library(h2o)
     h2o.init(nthreads=nthread) }
+  # set the number of cores to 1 for some algorithms. 
+  if(method=="OneR"| method=="LMT"){
+    nthread=1
+  }
+  # cl=makeCluster(nthread)
+  registerDoParallel(cores=nthread)
   
   # record the time
   timeRecordB()
