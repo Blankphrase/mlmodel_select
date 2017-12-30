@@ -75,7 +75,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   
   # wrap up the parallel connections. 
   if(grepl(pattern="h2o",method)){ 
-   h2o::h2o.shutdown(prompt = FALSE) }
+   h2o.shutdown(prompt = FALSE) }
   stopCluster(cl)
   stopImplicitCluster()
   gc()
@@ -307,7 +307,8 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
 # select models that has a cv median ROC value between 0.84 and 0.84275. 
 # testmodels_metric_filtered=testmodels_churn%>%filter_model(metric="ROC",mini=0.84,max=0.84275,FUN=median)
 # you could use custom functions to calculate a statistic for a k-fold performance metric
-# This function used the performance metrics after feed the model into resamples function in caret package. You could get the same dataframe with model_list%>%resamples%>%.$values.
+# This function used the performance metrics after feed the model into resamples function in caret package. 
+# You could get the same dataframe with model_list%>%resamples%>%.$values.
 
 
 #==============================================================================================================================================================
@@ -316,6 +317,9 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
 # This function will also remove models that have NA value in resampled performance. a.k.a NA value in modelCor function output.
 # get rid of the missing values
 # select models based on cor_level. Get rid of the models with high correlation.
+## Wrapper for auto-tune many ML algorithms supported by caret. 
+
+
 # issue a warning if the model list in any step is empty. 
 ml_cor_filter=function(models,cor_level=0.9){
   # a function to remove models that have NA performance value after resample. a.k.a. modelCor function produces NA values. 
@@ -409,7 +413,7 @@ install_pkg_model_names=function(model_names){
   
   model_names=unique(model_names)
   pkg_names=foreach::foreach(i=seq_along(model_names),.combine=c)%do%{
-    caret::getModelInfo()[[model_names[i]]]$library
+    return(caret::getModelInfo()[[model_names[i]]]$library)
   }
   
   # check for the difference between required package and installed packages. 
@@ -435,7 +439,7 @@ install_pkg_model_names=function(model_names){
 
 install_pkg_model_list=function(models){
   model_libs=foreach::foreach(i=seq_along(models),.combine = c)%do%{
-    models[[i]]$modelInfo$library
+    return(models[[i]]$modelInfo$library)
   }
   install_pkg_model_names(model_libs)
 }
@@ -461,3 +465,27 @@ assign_model_names=function(models){
 
 # example use 
 # down_sampling_models= assign_model_names(down_sampling_models)
+
+
+
+model_list_load=function(path){
+  current_path=getwd()
+  setwd(path)
+  path_command=paste("cd ",path,";ls")
+  file_names=system(path_command,intern = TRUE)
+  message(paste("Loading "),length(file_names)," models.")
+  library(foreach)
+  model_list=foreach(ih=seq_along(file_names))%do%{
+    model=readRDS(file=file_names[i])
+    message(paste("Finished loading model:",file_names[i],"\n",i,"/",length(file_names)))
+    return(model)
+  }
+  
+  setwd(current_path)
+  return(model_list)
+
+  }
+
+
+# example use
+# models=model_list_load(path="~/Dropbox/churn/down_sampling")
