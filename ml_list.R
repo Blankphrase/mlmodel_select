@@ -6,8 +6,7 @@
 library(foreach)
 library(magrittr)
 library(caret)
-library(plyr)
-library(dplyr)
+library(plyr);library(dplyr)
 # another package glue is not loaded here. Since it is only used for collapse the preProcess parameter.
 # source the timeRecord function dependency here
 source("https://raw.githubusercontent.com/edwardcooper/mlmodel_select/master/timeRecord_functions.R")
