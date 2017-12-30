@@ -73,6 +73,9 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   timeRecordB(output_message = output_message)
   
   
+  # wrap up the parallel connections. 
+  if(grepl(pattern="h2o",method)){ 
+   h2o::h2o.shutdown(prompt = FALSE) }
   stopCluster(cl)
   stopImplicitCluster()
   gc()
