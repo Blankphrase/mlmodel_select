@@ -198,7 +198,7 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
 # Functions to do model selection
 
 ## plot the model performance for models with different metrics. 
-ml_bwplot=function(models){
+ml_bwplot=function(models,metric=NULL){
   # get the metrics from the caret model list. 
   model_metrics=models%>%lapply( function(model_list){model_list$metric})%>%unlist
   # plot the model performance for metric-group ROC,Sens,Spec and/or Accuracy, Kappa. 
@@ -207,12 +207,22 @@ ml_bwplot=function(models){
   # if there is one group, then just plot it. 
   if(c("ROC","Sens","Spec") %in% model_metrics && c("Accuracy","Kappa") %in% model_metrics){
     # if the model selection does not depend on model correlation. a.k.a the cor_level is null. 
+    if(is.null(metric)){
+      models[model_metrics %in% c("ROC","Sens","Spec")]%>%resamples%>%bwplot%>%print
+      
+      models[model_metrics %in% c("Accuracy","Kappa")]%>%resamples%>%bwplot%>%print
+    }else{
+      models[model_metrics %in% c("ROC","Sens","Spec")]%>%resamples%>%bwplot(metric=metric)%>%print
+      
+      models[model_metrics %in% c("Accuracy","Kappa")]%>%resamples%>%bwplot(metric=metric)%>%print
+    }
     
-    models[model_metrics %in% c("ROC","Sens","Spec")]%>%resamples%>%bwplot%>%print
-    
-    models[model_metrics %in% c("Accuracy","Kappa")]%>%resamples%>%bwplot%>%print
   }else{
-    models%>%resamples%>%bwplot%>%print
+    if(is.null(metric)){
+      models%>%resamples%>%bwplot%>%print
+    }else{
+      models%>%resamples%>%bwplot(metric=metric)%>%print
+    }
   }
   return(models)
 }
