@@ -54,13 +54,11 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   )
   
   # collapse the vector for preprocessing to a single character. 
-  preProcess=glue::collapse(preProcess,sep=" ")
+  preProcess_message=glue::collapse(preProcess,sep=" ")
   # The output message paste together. 
-  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,"search:",search,"preProcess:",preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
-  # output the model that just finished training. 
-  output_message%>%message()
+  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,"search:",search,"preProcess:",preProcess_message,"cv_num:",k,"repeats:",repeats,sep=" ")
   #record the time use.
-  
+  timeRecordB()
   # train the function 
   # consider change the input into x and y in the future.
   ml_with_sampling_preprocess=train(  x=data[,colnames(data)!=target]
@@ -72,6 +70,9 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
  
   timeRecordB(output_message = output_message)
   
+
+  # output the model that just finished training. 
+  output_message%>%message()
   
   # wrap up the parallel connections. 
   if(grepl(pattern="h2o",method)){ 
@@ -156,8 +157,8 @@ ml_list=function(data,target,params,summaryFunction=twoClassSummary,save_model=N
     # save each model to disk.
     # ======================================
     # change the preprocess vector into a single chr. 
-    preProcess=glue::collapse(preProcess,sep="_")
-    file_name=paste(i,method,sampling,preProcess,metric,sep="_")
+    preProcess_message=glue::collapse(preProcess,sep="_")
+    file_name=paste(i,method,sampling,preProcess_message,metric,sep="_")
     # if the save_model is not null, then save each model 
     if(!is.null(save_model)){ 
       # Use the save_model string as the name for the subdirectory to store each models.
@@ -457,7 +458,7 @@ install_pkg_model_list=function(models){
 
 # install_pkg_model_list(models=down_sampling_models)
 
-# give models a meaningful names for comaprison. 
+# give models a meaningful names for comparison. 
 assign_model_names=function(models){
   model_names=foreach::foreach(i=seq_along(models))%do%{
     method=models[[i]]$method
