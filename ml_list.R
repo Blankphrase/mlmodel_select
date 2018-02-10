@@ -53,6 +53,13 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
          }
   )
   
+  # collapse the vector for preprocessing to a single character. 
+  preProcess=glue::collapse(preProcess,sep=" ")
+  # The output message paste together. 
+  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,"search:",search,"preProcess:",preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
+  # output the model that just finished training. 
+  output_message%>%message()
+  #record the time use.
   
   # train the function 
   # consider change the input into x and y in the future.
@@ -62,13 +69,7 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
                                       , metric=metric
                                       , trControl=ctrl_with_sampling
                                       , tuneLength=tuneLength,preProcess=preProcess)
-  # collapse the vector for preprocessing to a single character. 
-  preProcess=glue::collapse(preProcess,sep=" ")
-  # The output message paste together. 
-  output_message=paste(method,sampling,metric,"tuneLength:",tuneLength,"search:",search,"preProcess:",preProcess,"cv_num:",k,"repeats:",repeats,sep=" ")
-  # output the model that just finished training. 
-  output_message%>%message()
-  #record the time use. 
+ 
   timeRecordB(output_message = output_message)
   
   
