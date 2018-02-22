@@ -486,7 +486,7 @@ model_list_load=function(path){
   file_names=system(path_command,intern = TRUE)
   message(paste("Loading "),length(file_names)," models.")
   library(foreach)
-  model_list=foreach(ih=seq_along(file_names))%do%{
+  model_list=foreach(i=seq_along(file_names))%do%{
     model=readRDS(file=file_names[i])
     message(paste("Finished loading model:",file_names[i],"\n",i,"/",length(file_names)))
     return(model)
