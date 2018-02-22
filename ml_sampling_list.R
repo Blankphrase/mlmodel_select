@@ -40,28 +40,47 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
   
   
   # implement different sampling methods. Only invoke the switch below if the sampling method is in the vector  c("ADAS","ANS","BLSMOTE","DBSMOTE","RSLS","SLS")
-  if(sampling %in% c("ADAS","ANS","BLSMOTE","DBSMOTE","RSLS","SLS")){
-    switch(sampling,
-           ADAS={sampling <- list(name = "ADAS",
-                                  func = function (x, y) {
-                                    
-                                    library(smotefamily)
-                                    library(FNN)
-                                    dat <- if (is.data.frame(x)) x else as.data.frame(x)
-                                    
-                                    dat$.y <- y
-                                    
-                                    dat <- ADAS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
-                                    dat=dat$data
-                                    list(x = dat[,!colnames(dat)=="class"], 
-                                         y = as.factor(dat[,colnames(dat)=="class"]))
-                                    
-                                  }
-                                  ,first = TRUE)
-           
-           },
-           ANS={
-             sampling <- list(name = "ANS",
+  if(!is.null(sampling)){
+    if(sampling %in% c("ADAS","ANS","BLSMOTE","DBSMOTE","RSLS","SLS")){
+      switch(sampling,
+             ADAS={sampling <- list(name = "ADAS",
+                                    func = function (x, y) {
+                                      
+                                      library(smotefamily)
+                                      library(FNN)
+                                      dat <- if (is.data.frame(x)) x else as.data.frame(x)
+                                      
+                                      dat$.y <- y
+                                      
+                                      dat <- ADAS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                      dat=dat$data
+                                      list(x = dat[,!colnames(dat)=="class"], 
+                                           y = as.factor(dat[,colnames(dat)=="class"]))
+                                      
+                                    }
+                                    ,first = TRUE)
+             
+             },
+             ANS={
+               sampling <- list(name = "ANS",
+                                func = function (x, y) {
+                                  
+                                  library(smotefamily)
+                                  library(FNN)
+                                  dat <- if (is.data.frame(x)) x else as.data.frame(x)
+                                  
+                                  dat$.y <- y
+                                  
+                                  dat <- ANS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                  dat=dat$data
+                                  list(x = dat[,!colnames(dat)=="class"], 
+                                       y = as.factor(dat[,colnames(dat)=="class"]))
+                                  
+                                }
+                                ,first = TRUE)
+             },
+             BLSMOTE={
+               sampling<-list(name = "BLSMOTE",
                               func = function (x, y) {
                                 
                                 library(smotefamily)
@@ -70,90 +89,74 @@ ml_tune=function(data,target,sampling=NULL,metric="Accuracy",search = "random",k
                                 
                                 dat$.y <- y
                                 
-                                dat <- ANS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                dat <- BLSMOTE(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
                                 dat=dat$data
                                 list(x = dat[,!colnames(dat)=="class"], 
                                      y = as.factor(dat[,colnames(dat)=="class"]))
                                 
                               }
                               ,first = TRUE)
-           },
-           BLSMOTE={
-             sampling<-list(name = "BLSMOTE",
-                            func = function (x, y) {
-                              
-                              library(smotefamily)
-                              library(FNN)
-                              dat <- if (is.data.frame(x)) x else as.data.frame(x)
-                              
-                              dat$.y <- y
-                              
-                              dat <- BLSMOTE(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
-                              dat=dat$data
-                              list(x = dat[,!colnames(dat)=="class"], 
-                                   y = as.factor(dat[,colnames(dat)=="class"]))
-                              
-                            }
-                            ,first = TRUE)
-           },
-           DBSMOTE={
-             sampling<-list(name = "DBSMOTE",
-                            func = function (x, y) {
-                              
-                              library(smotefamily)
-                              library(dbscan)
-                              dat <- if (is.data.frame(x)) x else as.data.frame(x)
-                              
-                              dat$.y <- y
-                              
-                              dat <- DBSMOTE(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
-                              dat=dat$data
-                              list(x = dat[,!colnames(dat)=="class"], 
-                                   y = as.factor(dat[,colnames(dat)=="class"]))
-                              
-                            }
-                            ,first = TRUE)
-           },
-           RSLS={
-             sampling<-list(name = "RSLS",
-                            func = function (x, y) {
-                              
-                              library(smotefamily)
-                              library(dbscan)
-                              dat <- if (is.data.frame(x)) x else as.data.frame(x)
-                              
-                              dat$.y <- y
-                              
-                              dat <- RSLS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
-                              dat=dat$data
-                              list(x = dat[,!colnames(dat)=="class"], 
-                                   y = as.factor(dat[,colnames(dat)=="class"]))
-                              
-                            }
-                            ,first = TRUE)
-           },
-           SLS={
-             sampling<-list(name = "SLS",
-                            func = function (x, y) {
-                              
-                              library(smotefamily)
-                              library(dbscan)
-                              dat <- if (is.data.frame(x)) x else as.data.frame(x)
-                              
-                              dat$.y <- y
-                              
-                              dat <- SLS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
-                              dat=dat$data
-                              list(x = dat[,!colnames(dat)=="class"], 
-                                   y = as.factor(dat[,colnames(dat)=="class"]))
-                              
-                            }
-                            ,first = TRUE)
-           }
-           
-    )
-    
+             },
+             DBSMOTE={
+               sampling<-list(name = "DBSMOTE",
+                              func = function (x, y) {
+                                
+                                library(smotefamily)
+                                library(dbscan)
+                                dat <- if (is.data.frame(x)) x else as.data.frame(x)
+                                
+                                dat$.y <- y
+                                
+                                dat <- DBSMOTE(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                dat=dat$data
+                                list(x = dat[,!colnames(dat)=="class"], 
+                                     y = as.factor(dat[,colnames(dat)=="class"]))
+                                
+                              }
+                              ,first = TRUE)
+             },
+             RSLS={
+               sampling<-list(name = "RSLS",
+                              func = function (x, y) {
+                                
+                                library(smotefamily)
+                                library(dbscan)
+                                dat <- if (is.data.frame(x)) x else as.data.frame(x)
+                                
+                                dat$.y <- y
+                                
+                                dat <- RSLS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                dat=dat$data
+                                list(x = dat[,!colnames(dat)=="class"], 
+                                     y = as.factor(dat[,colnames(dat)=="class"]))
+                                
+                              }
+                              ,first = TRUE)
+             },
+             SLS={
+               sampling<-list(name = "SLS",
+                              func = function (x, y) {
+                                
+                                library(smotefamily)
+                                library(dbscan)
+                                dat <- if (is.data.frame(x)) x else as.data.frame(x)
+                                
+                                dat$.y <- y
+                                
+                                dat <- SLS(X=dat[, !grepl(".y", colnames(dat), fixed = TRUE)],target=dat$.y)
+                                dat=dat$data
+                                list(x = dat[,!colnames(dat)=="class"], 
+                                     y = as.factor(dat[,colnames(dat)=="class"]))
+                                
+                              }
+                              ,first = TRUE)
+             }
+             
+      )
+      
+    }
   }
+  
   # end of the if for changing sampling method. 
   
   # record the time
