@@ -500,3 +500,17 @@ model_list_load=function(path){
 
 # example use
 # models=model_list_load(path="~/Dropbox/churn/down_sampling")
+
+# calculates the performance of models on training or test data.
+ml_newdata_metric=function(models,newdata,target){
+  test_data_performance=foreach(i=seq_along(models),.combine = rbind,.errorhandling="remove")%do%{
+    performance_1=models[[i]]%>%predict(newdata)%>%confusionMatrix(newdata[,colnames(newdata)==target])%>%.$overall
+    performance_2=models[[i]]%>%predict(newdata)%>%confusionMatrix(newdata[,colnames(newdata)==target])%>%.$byClass
+    performance=c(performance_1,performance_2)
+    return(performance)
+  }
+  return(test_data_performance)
+}
+# example use 
+# train_titanic_performance=ml_newdata_metric(models = data_clean_1_baseline_models,newdata=train_titanic,target="Survived")
+# test_titanic_performance=ml_newdata_metric(models = data_clean_1_baseline_models,newdata=test_titanic,target="Survived")
