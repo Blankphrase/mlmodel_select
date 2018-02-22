@@ -262,22 +262,22 @@ ml_cv_filter=function(models,metric="ROC",mini=NULL,max=NULL,FUN=median){
               ,{
                 # for using only mini
                 print("using mini")
-                filter_values=(model%>%resamples%>%.$values%>%select(contains(metric))%>%apply(2,FUN)%>%unlist)>mini
+                filter_values=(model%>%resamples%>%.$values%>%select(contains(paste0("~",metric)))%>%apply(2,FUN)%>%unlist)>mini
               }
               ,{
                 # for using max and mini
                 print("using max and mini")
-                filter_values_mini=(model%>%resamples%>%.$values%>%select(contains(metric))%>%apply(2,FUN)%>%unlist)>mini
-                filter_values_max=(model%>%resamples%>%.$values%>%select(contains(metric))%>%apply(2,FUN)%>%unlist)<max
+                filter_values_mini=(model%>%resamples%>%.$values%>%select(contains(paste0("~",metric)))%>%apply(2,FUN)%>%unlist)>mini
+                filter_values_max=(model%>%resamples%>%.$values%>%select(contains(paste0("~",metric)))%>%apply(2,FUN)%>%unlist)<max
                 filter_values=(filter_values_max & filter_values_mini)
               }
               ,{
                 # for using only max
                 print("using max")
-                filter_values=(model%>%resamples%>%.$values%>%select(contains(metric))%>%apply(2,FUN)%>%unlist)<max
+                filter_values=(model%>%resamples%>%.$values%>%select(contains(paste0("~",metric)))%>%apply(2,FUN)%>%unlist)<max
               }
       )
-      model%>%resamples%>%.$values%>%select(contains(metric))%>%apply(2,FUN)%>%unlist%>%print
+      model%>%resamples%>%.$values%>%select(contains(paste0("~",metric)))%>%apply(2,FUN)%>%unlist%>%print
       filter_values%>%print
       filtered_model_from_metric=model[filter_values]
     }else{
